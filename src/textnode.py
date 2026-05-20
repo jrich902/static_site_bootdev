@@ -139,5 +139,11 @@ def text_to_textnodes(text):
     return nodes
 
 def markdown_to_blocks(markdown):
-    ...
+    stirpped_markdown = markdown.strip()
+    block_list = stirpped_markdown.split("\n\n")
+    block_list = [block for block in block_list if block.strip()]
+    return block_list
+
+
+
 
