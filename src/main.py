@@ -2,20 +2,18 @@ from textnode import *
 import shutil
 import os
 from markdown_blocks import markdown_to_html_node
+import sys
 
-
-def clean_up_public():
-    path = "public"
+def clean_up(path):
     if os.path.exists(path):
         print(f"deleting {path}")
         shutil.rmtree(path)
         print(f"creating new empty {path}")
         os.mkdir(path)
 
-def copy_from_static():
+def copy_from_static(dst):
     src = "static"
-    dst = "public"
-    clean_up_public()
+    clean_up(dst)
     recursive_copy(src, dst)
 
 def recursive_copy(src, dst):
@@ -59,7 +57,13 @@ def generate_page(from_path, template_path, dest_path):
     
     print(f"page_content:\n{page_html}")
     page = page.replace("{{ Content }}", page_html)
-   
+    if len(sys.argv) < 2:
+        print("no basepath provided!")
+    else:
+        basepath = sys.argv[1]
+        page = page.replace("href=\"/", f"href=\"{basepath}")
+        page = page.replace("src=\"/", f"src=\"{basepath}")
+    
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
 
     with open(dest_path, "w") as file:
@@ -97,7 +101,7 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
         print(f"generated page: {dst_file}")
 
 def main():
-    copy_from_static()
-    generate_pages_recursive("content", "template.html", "public")
+    copy_from_static("docs")
+    generate_pages_recursive("content", "template.html", "docs")
 
 main()
